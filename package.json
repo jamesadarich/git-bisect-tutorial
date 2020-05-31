@@ -1,0 +1,27 @@
+{
+  "name": "git-bisect-tutorial",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Using a unit test to find the origin of a bug",
+  "main": "index.js",
+  "scripts": {
+    "test": "alsatian \"./src/**/*.spec.ts\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jamesadarich/git-bisect-tutorial.git"
+  },
+  "author": {
+    "name": "James Adrich",
+    "url": "https://james.adarich.com"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jamesadarich/git-bisect-tutorial/issues"
+  },
+  "homepage": "https://github.com/jamesadarich/git-bisect-tutorial#readme",
+  "dependencies": {
+    "alsatian": "^3.2.1",
+    "typescript": "^3.9.3"
+  }
+}
