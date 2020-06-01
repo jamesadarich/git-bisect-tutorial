@@ -4,9 +4,20 @@
 
 Find across 1000 commits
 
+`git bisect bad`
+first commit `git rev-list --max-parents=0 HEAD`
+`git bisect good`
+
+```typescript
+    @Test("multiplying the same numbers has the same result")
+    public twoValuesAlwaysSame() {
+        Expect(multiply(2, 2)).toBe(multiply(2, 2));
+    }
+```
+
 ## Automating Git Bisect
 
-Connect up using `git bisect run`
+Connect up using `git bisect run npm test`
 
 ### Handling invalid commits
 
