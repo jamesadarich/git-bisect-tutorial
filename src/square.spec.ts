@@ -8,4 +8,9 @@ export class SquareTests {
     public twoValuesAreMultiplied() {
         Expect(square(2)).toBe(4);
     }
+
+    @Test("zero squared is zero")
+    public zeroSquaredIsZero() {
+        Expect(square(0)).toBe(0);
+    }
 }
