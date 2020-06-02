@@ -63,7 +63,7 @@ git bisect good b31bd4f6f203f012430bbff0edab37b47a4f2fde
 git bisect run npm test
 ```
 
-Bad news is this incorrectly identifies commit 
+Bad news is this incorrectly identifies commit `cff93612677abc9c18fc8860be09a30b4e94d8dc` as the offending commit but we can see that this has no changes involving `src/square.ts`. This is because the test doesn't compile due to the source file being missing and sends an error code which git bisect interprets as bad. 
 
 In the case we don't know what the outcome is of a bisect we can pass `git bisect skip`. But as we're using a script how do we achieve this? Simply exit with code 125 will indicate the result is unknown.
 
