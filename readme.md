@@ -6,12 +6,19 @@ Git Bisect is a great tool to find the source of an issue in large code bases wi
 
 Let's try it out, first we need to write a test to determine the bug.
 
-Add the following to `src/multiply.spec.ts`
+Add the following to a new file e.g. `test/bisect.spec.ts` - it's important this is a new file in a tree that isn't used in your history as git is going to start changing commits soon so if a conflict occurs this is going to break.
 
 ```typescript
-@Test("multiplying the same numbers has the same result")
-public twoValuesAlwaysSame() {
-    Expect(multiply(2, 2)).toBe(multiply(2, 2));
+
+import { Expect, Test, TestFixture } from "alsatian";
+import { square } from "../src/square";
+
+@TestFixture("bisect tests")
+export class BisectTests {    
+    @Test("multiplying the same numbers has the same result")
+    public twoValuesAlwaysSame() {
+        Expect(multiply(2, 2)).toBe(multiply(2, 2));
+    }
 }
 ```
 
@@ -47,47 +54,60 @@ In an ideal world every single commit in your repository will compile and run te
 
 #### Detecting feature not there / bad compile commit
 
-Exit code 125?
+Let's try another commit range as now we have a bug to track down in `src/square.ts`
 
-b31bd4f6f203f012430bbff0edab37b47a4f2fde
+```
+git bisect start
+git bisect bad
+git bisect good b31bd4f6f203f012430bbff0edab37b47a4f2fde
+git bisect run npm test
+```
 
+Bad news is this incorrectly identifies commit 
+
+In the case we don't know what the outcome is of a bisect we can pass `git bisect skip`. But as we're using a script how do we achieve this? Simply exit with code 125 will indicate the result is unknown.
+
+The following bash script will skip commits where the source file is missing.
+
+```bash
+#!/bin/bash
+
+set -e
+
+SOURCE_FILE="./src/square.ts"
+
+if test -f "$SOURCE_FILE"; then
+    echo "found"
+    npx alsatian ./bisect/bisect.spec.ts
+else
+    echo "not found"
+    exit 125
+fi
+```
+
+
+
+wrong commit - failing because file isn't there
+
+wrong commit - failing because doesn't compile
+
+two commits - bug commit is next to bad can't compile commit
+
+```typescript
 import { Expect, Test, TestFixture } from "alsatian";
+import { square } from "../src/square";
 
-@TestFixture("square tests")
-export class SquareTests {
+@TestFixture("bisect tests")
+export class BisectTests {
     @Test("four can be squared")
     public async fourCanBeSquared() {
-        let square: (x: number) => number;
-        try {            
-            square = require("./square");
-        }
-        catch (error) {
-            process.exit(125);
-            return;
-        }
-
         Expect(() => square(4)).not.toThrow();
     }
 }
+```
 
-    @Test("four can be squared")
-    public fourCanBeSquared() {
-        Expect(() => square(4)).not.toThrow();
-    }
-
-    cff93612677abc9c18fc8860be09a30b4e94d8dc
+wrongly get -> cff93612677abc9c18fc8860be09a30b4e94d8dc
 
 #### Squash commits
 
-Bug is in squashed commit
-
-
-1 - function not there
-2 - function not there
-3 - bad compile
-4 - function not there
-5 - function not there
-6 - function here
-8 - bad compile
-7 - bug from PR
-9 - bug still here
+If it's still not clear and the commit selected is a squash of a large change you can always restore that branch and bisect again on that branch :)
