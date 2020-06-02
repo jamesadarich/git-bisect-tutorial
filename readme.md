@@ -85,11 +85,32 @@ else
 fi
 ```
 
+Great a different commit but bad news it's still the wrong one. This time it selects `848c4c923f54067ab446b9a41371cd6d43bfa337` as this commit does not compile. As this code would never have been released we can assume that commits that don't compile should also not be marked as bad.
 
+We update the script....
 
-wrong commit - failing because file isn't there
+```bash
+#!/bin/bash
 
-wrong commit - failing because doesn't compile
+set -e
+
+TESTFILE="./src/square.ts"
+
+if npx tsc; then
+    if test -f "$TESTFILE"; then
+        echo "found"
+        npx alsatian ./bisect/bisect.spec.ts
+    else
+        echo "not found"
+        exit 125
+    fi
+else
+    echo "bad commit - doesn't compile"
+    exit 125
+fi
+```
+
+... and run the bisect again.
 
 two commits - bug commit is next to bad can't compile commit
 
@@ -105,8 +126,6 @@ export class BisectTests {
     }
 }
 ```
-
-wrongly get -> cff93612677abc9c18fc8860be09a30b4e94d8dc
 
 #### Squash commits
 
