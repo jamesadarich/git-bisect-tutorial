@@ -127,6 +127,9 @@ export class BisectTests {
 }
 ```
 
+848c4c923f54067ab446b9a41371cd6d43bfa337
+14c2d4079c81acea4fda3ee0f0838a904faee19a
+
 #### Squash commits
 
 If it's still not clear and the commit selected is a squash of a large change you can always restore that branch and bisect again on that branch :)
