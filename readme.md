@@ -6,10 +6,9 @@ Git Bisect is a great tool to find the source of an issue in large code bases wi
 
 Let's try it out, first we need to write a test to determine the bug.
 
-Add the following to a new file e.g. `test/bisect.spec.ts` - it's important this is a new file in a tree that isn't used in your history as git is going to start changing commits soon so if a conflict occurs this is going to break.
+Add the following to a new file e.g. `bisect.spec.ts` - it's important this is a new file in a tree that isn't used in your history as git is going to start changing commits soon so if a conflict occurs this is going to break.
 
 ```typescript
-
 import { Expect, Test, TestFixture } from "alsatian";
 import { square } from "../src/square";
 
@@ -54,7 +53,22 @@ In an ideal world every single commit in your repository will compile and run te
 
 #### Detecting feature not there / bad compile commit
 
-Let's try another commit range as now we have a bug to track down in `src/square.ts`
+Let's try another commit range as now we have a bug to track down in `src/square.ts`. So let's write the following test.
+
+```typescript
+import { Expect, Test, TestFixture } from "alsatian";
+import { square } from "../src/square";
+
+@TestFixture("bisect tests")
+export class BisectTests {
+    @Test("four can be squared")
+    public async fourCanBeSquared() {
+        Expect(() => square(4)).not.toThrow();
+    }
+}
+```
+
+and start off the bisect
 
 ```
 git bisect start
@@ -78,7 +92,7 @@ SOURCE_FILE="./src/square.ts"
 
 if test -f "$SOURCE_FILE"; then
     echo "found"
-    npx alsatian ./bisect/bisect.spec.ts
+    npx alsatian ./bisect.spec.ts
 else
     echo "not found"
     exit 125
@@ -99,7 +113,7 @@ TESTFILE="./src/square.ts"
 if npx tsc; then
     if test -f "$TESTFILE"; then
         echo "found"
-        npx alsatian ./bisect/bisect.spec.ts
+        npx alsatian ./bisect.spec.ts
     else
         echo "not found"
         exit 125
@@ -113,22 +127,6 @@ fi
 ... and run the bisect again.
 
 two commits - bug commit is next to bad can't compile commit
-
-```typescript
-import { Expect, Test, TestFixture } from "alsatian";
-import { square } from "../src/square";
-
-@TestFixture("bisect tests")
-export class BisectTests {
-    @Test("four can be squared")
-    public async fourCanBeSquared() {
-        Expect(() => square(4)).not.toThrow();
-    }
-}
-```
-
-848c4c923f54067ab446b9a41371cd6d43bfa337
-14c2d4079c81acea4fda3ee0f0838a904faee19a
 
 #### Squash commits
 
